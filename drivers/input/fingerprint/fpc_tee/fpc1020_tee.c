@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-only
 /*
  * FPC1020 Fingerprint sensor device driver
  *
@@ -40,7 +41,6 @@
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 #include <linux/pm_wakeup.h>
-#include <linux/fb.h>
 #include <linux/pinctrl/qcom-pinctrl.h>
 
 #define FPC_GPIO_NO_DEFAULT -1
@@ -373,7 +373,7 @@ static DEVICE_ATTR(request_vreg, S_IWUSR, NULL, request_vreg_gpio_set);
  * backwards compatibility. Only prints a debug print that it is
  * disabled.
  */
-static ssize_t clk_enable_set(struct device *dev,
+static inline ssize_t clk_enable_set(struct device *dev,
 			      struct device_attribute *attr,
 			      const char *buf, size_t count)
 {
@@ -512,9 +512,8 @@ static ssize_t hw_reset_set(struct device *dev,
 		mutex_lock(&fpc1020->lock);
 		rc = hw_reset(fpc1020);
 		mutex_unlock(&fpc1020->lock);
-	} else {
+	} else
 		return -EINVAL;
-	}
 
 	return rc ? rc : count;
 }
@@ -620,9 +619,9 @@ static int device_prepare(struct fpc1020_data *fpc1020, bool enable)
 #endif
 exit:
 		fpc1020->prepared = false;
-	} else {
+	} else
 		rc = 0;
-	}
+	
 	mutex_unlock(&fpc1020->lock);
 
 	dev_dbg(dev, "fpc %s <---: exit! \n", __func__);
@@ -716,7 +715,7 @@ static DEVICE_ATTR(handle_wakelock, S_IWUSR, NULL, handle_wakelock_cmd);
  * sysf node to check the interrupt status of the sensor, the interrupt
  * handler should perform sysf_notify to allow userland to poll the node.
  */
-static ssize_t irq_get(struct device *dev,
+static inline ssize_t irq_get(struct device *dev,
 		       struct device_attribute *attr, char *buf)
 {
 	struct fpc1020_data *fpc1020 = dev_get_drvdata(dev);
@@ -729,7 +728,7 @@ static ssize_t irq_get(struct device *dev,
  * writing to the irq node will just drop a printk message
  * and return success, used for latency measurement.
  */
-static ssize_t irq_ack(struct device *dev,
+static inline ssize_t irq_ack(struct device *dev,
 		       struct device_attribute *attr,
 		       const char *buf, size_t count)
 {
@@ -742,7 +741,7 @@ static ssize_t irq_ack(struct device *dev,
 
 static DEVICE_ATTR(irq, S_IRUSR | S_IWUSR, irq_get, irq_ack);
 
-static ssize_t vendor_update(struct device *dev,
+static inline ssize_t vendor_update(struct device *dev,
 			     struct device_attribute *attr,
 			     const char *buf, size_t count)
 {
@@ -805,14 +804,10 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 
 	dev_dbg(fpc1020->dev, "%s\n", __func__);
 
-	mutex_lock(&fpc1020->lock);
-
 	if (atomic_read(&fpc1020->wakeup_enabled)) {
 		fpc1020->nbr_irqs_received++;
 		__pm_wakeup_event(fpc1020->ttw_wl, (FPC_TTW_HOLD_TIME));
 	}
-
-	mutex_unlock(&fpc1020->lock);
 
 	sysfs_notify(&fpc1020->dev->kobj, NULL, dev_attr_irq.attr.name);
 
@@ -981,7 +976,7 @@ static struct platform_driver fpc1020_driver = {
 	.remove = fpc1020_remove,
 };
 
-static int __init fpc1020_init(void)
+static inline int __init fpc1020_init(void)
 {
 	int rc;
 
@@ -994,7 +989,7 @@ static int __init fpc1020_init(void)
 	return rc;
 }
 
-static void __exit fpc1020_exit(void)
+static inline void __exit fpc1020_exit(void)
 {
 	pr_info("%s\n", __func__);
 	platform_driver_unregister(&fpc1020_driver);
