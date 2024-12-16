@@ -631,7 +631,7 @@ static int smb2_usb_set_prop(struct power_supply *psy,
 		rc = smblib_set_prop_sdp_current_max(chg, val);
 		break;
 	default:
-		pr_err("set prop %d is not supported\n", psp);
+		pr_debug("set prop %d is not supported\n", psp);
 		rc = -EINVAL;
 		break;
 	}
@@ -742,7 +742,7 @@ static int smb2_usb_port_set_prop(struct power_supply *psy,
 
 	switch (psp) {
 	default:
-		pr_err_ratelimited("Set prop %d is not supported in pc_port\n",
+		pr_debug("Set prop %d is not supported in pc_port\n",
 				psp);
 		rc = -EINVAL;
 		break;
@@ -865,7 +865,7 @@ static int smb2_usb_main_set_prop(struct power_supply *psy,
 		rc = smblib_toggle_stat(chg, val->intval);
 		break;
 	default:
-		pr_err("set prop %d is not supported\n", psp);
+		pr_debug("set prop %d is not supported\n", psp);
 		rc = -EINVAL;
 		break;
 	}
@@ -2616,7 +2616,7 @@ static int smb2_probe(struct platform_device *pdev)
 
 	device_init_wakeup(chg->dev, true);
 
-	pr_info("QPNP SMB2 probed successfully usb:present=%d type=%d batt:present = %d health = %d charge = %d\n",
+	pr_debug("QPNP SMB2 probed successfully usb:present=%d type=%d batt:present = %d health = %d charge = %d\n",
 		usb_present, chg->real_charger_type,
 		batt_present, batt_health, batt_charge_type);
 	return rc;
