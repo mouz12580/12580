@@ -11,7 +11,10 @@
 #else
 #include <vdso/const.h>
 
+#ifndef BIT
 #define BIT(nr)                        (UL(1) << (nr))
 #endif
 
-#endif        /* __VDSO_BITS_H */
+#endif // __GENKSYMS__
+
+#endif // __VDSO_BITS_H
