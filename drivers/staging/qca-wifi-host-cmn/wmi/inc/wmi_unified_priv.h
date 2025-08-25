@@ -160,8 +160,6 @@ struct wmi_ext_dbg_msg {
 #define wmi_info_rl(params...) QDF_TRACE_INFO_RL(QDF_MODULE_ID_WMI, params)
 #define wmi_debug_rl(params...) QDF_TRACE_DEBUG_RL(QDF_MODULE_ID_WMI, params)
 
-#ifdef WMI_INTERFACE_EVENT_LOGGING
-
 /**
  * struct wmi_command_debug - WMI command log buffer data type
  * @ command - Store WMI Command id
@@ -290,8 +288,6 @@ enum WMI_RECORD_TYPE {
 	WMI_CMD = 1,
 	WMI_EVT = 2,
 };
-
-#endif /*WMI_INTERFACE_EVENT_LOGGING */
 
 #ifdef WLAN_OPEN_SOURCE
 struct fwdebug {
