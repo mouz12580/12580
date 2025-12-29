@@ -4,14 +4,14 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=REAL-KING KERNEL by ROHAIL(@Rohail33)--Telegram
+kernel.string=by HK122707
 do.devicecheck=1
 do.modules=0
 do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
-device.name1=
-device.name2=
+device.name1=alioth
+device.name2=aliothin
 device.name3=
 device.name4=
 device.name5=
@@ -46,9 +46,10 @@ fi;
 
 write_boot;
 ## end install
+
 ## vendor_boot shell variables
 block=/dev/block/bootdevice/by-name/vendor_boot;
-is_slot_device=auto;
+is_slot_device=1;
 ramdisk_compression=auto;
 patch_vbmeta_flag=auto;
 
