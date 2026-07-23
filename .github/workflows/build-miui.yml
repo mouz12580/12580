@@ -1,0 +1,67 @@
+name: MIUI-Kernel
+
+on: 
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps: 
+    - name: Checkout Kernel Source Code
+      uses: actions/checkout@v4
+      with:
+        github-server-url: 'https://github.com'
+        repository: mouz12580/12580
+        ref: time
+        path: android-kernel
+
+    - name: Setup Build Environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git-core git-lfs gnupg flex bison build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libncurses5 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python-is-python3 python2 cpio p7zip-full
+    
+    - name: Download Clang Toolchain and Generate Kernel Configuration
+      run: |
+        mkdir Clang
+        cd Clang
+        wget -q https://github.com/XSans0/WeebX-Clang/releases/download/WeebX-Clang-19.1.5-release/WeebX-Clang-19.1.5.tar.gz -O Clang.tar.gz
+        tar -zxf Clang.tar.gz
+        CLANG_DIR=`pwd`
+        echo "CLANG_DIR=$CLANG_DIR" >> $GITHUB_ENV
+        cd ../android-kernel
+        sed -i 's/qcom,mdss-pan-physical-width-dimension = <70>;$/qcom,mdss-pan-physical-width-dimension = <700>;/' arch/arm64/boot/dts/vendor/qcom/dsi-panel-k11a-38-08-0a-dsc-cmd.dtsi
+        sed -i 's/qcom,mdss-pan-physical-height-dimension = <155>;$/qcom,mdss-pan-physical-height-dimension = <1540>;/' arch/arm64/boot/dts/vendor/qcom/dsi-panel-k11a-38-08-0a-dsc-cmd.dtsi
+        curl -LSs "https://raw.githubusercontent.com/mouz12580/12580/main/setup.sh" | bash -s legacy
+        PATH=${{ env.CLANG_DIR }}/bin:$PATH
+        DEVICE_NAME=alioth
+        KERNEL_DEFCONFIG=alioth_defconfig
+        KERNEL_DIR=`pwd`
+        echo "KERNEL_DIR=${KERNEL_DIR}" >> $GITHUB_ENV
+        echo "ZIMAGE_DIR="${KERNEL_DIR}/out/arch/arm64/boot"" >> $GITHUB_ENV
+        ARCH=arm64
+        SUBARCH=arm64
+        cd $KERNEL_DIR
+        make $KERNEL_DEFCONFIG O=out CC=clang ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- NM=llvm-nm OBJDUMP=llvm-objdump STRIP=llvm-strip
+
+    - name: Build Kernel
+      run: |
+        cd android-kernel
+        PATH=${{ env.CLANG_DIR }}/bin:$PATH
+        SUBARCH=arm64
+        make -j$(nproc --all) O=out CC=clang ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- NM=llvm-nm OBJDUMP=llvm-objdump STRIP=llvm-strip
+  
+    - name: ZIP Kernel
+      run: |
+        cd android-kernel
+        cp -fp ${{ env.ZIMAGE_DIR }}/Image.gz anykernel
+        cp -fp $ZIMAGE_DIR/dtbo.img anykernel
+        cp -fp $ZIMAGE_DIR/dtb anykernel
+        TIME=$(TZ=Asia/Shanghai date "+%H%M")
+        echo "ZIMAGE_NAME=Panda-"$TIME >> $GITHUB_ENV
+        rm -rf out
+        
+    - name: Upload Kernel Image ZIP
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.ZIMAGE_NAME }}
+        path: android-kernel/anykernel/*
