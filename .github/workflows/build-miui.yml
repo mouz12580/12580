@@ -5,10 +5,10 @@ on:
   
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps: 
     - name: Checkout Kernel Source Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         github-server-url: 'https://github.com'
         repository: mouz12580/12580
@@ -61,7 +61,7 @@ jobs:
         rm -rf out
         
     - name: Upload Kernel Image ZIP
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ env.ZIMAGE_NAME }}
         path: android-kernel/anykernel/*
