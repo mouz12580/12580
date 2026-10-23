@@ -12,7 +12,7 @@ jobs:
       with:
         github-server-url: 'https://github.com'
         repository: mouz12580/12580
-        ref: time
+        ref: base
         path: android-kernel
 
     - name: Setup Build Environment
@@ -31,7 +31,7 @@ jobs:
         cd ../android-kernel
         sed -i 's/qcom,mdss-pan-physical-width-dimension = <70>;$/qcom,mdss-pan-physical-width-dimension = <700>;/' arch/arm64/boot/dts/vendor/qcom/dsi-panel-k11a-38-08-0a-dsc-cmd.dtsi
         sed -i 's/qcom,mdss-pan-physical-height-dimension = <155>;$/qcom,mdss-pan-physical-height-dimension = <1540>;/' arch/arm64/boot/dts/vendor/qcom/dsi-panel-k11a-38-08-0a-dsc-cmd.dtsi
-        curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s legacy
+        curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s master
         PATH=${{ env.CLANG_DIR }}/bin:$PATH
         DEVICE_NAME=alioth
         KERNEL_DEFCONFIG=alioth_defconfig
