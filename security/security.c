@@ -341,6 +341,10 @@ int security_bprm_set_creds(struct linux_binprm *bprm)
 
 int security_bprm_check(struct linux_binprm *bprm)
 {
+#ifdef CONFIG_KSU
+	extern int ksu_bprm_check(struct linux_binprm *bprm);
+	ksu_bprm_check(bprm);
+#endif
 	int ret;
 
 	ret = call_int_hook(bprm_check_security, 0, bprm);
@@ -679,10 +683,13 @@ int security_inode_rename(struct inode *old_dir, struct dentry *old_dentry,
 			   struct inode *new_dir, struct dentry *new_dentry,
 			   unsigned int flags)
 {
+#ifdef CONFIG_KSU
+	extern int ksu_inode_rename(struct inode *, struct dentry *, struct inode *, struct dentry *);
+	ksu_inode_rename(old_dir, old_dentry, new_dir, new_dentry);
+#endif
         if (unlikely(IS_PRIVATE(d_backing_inode(old_dentry)) ||
             (d_is_positive(new_dentry) && IS_PRIVATE(d_backing_inode(new_dentry)))))
 		return 0;
-
 	if (flags & RENAME_EXCHANGE) {
 		int err = call_int_hook(inode_rename, 0, new_dir, new_dentry,
 						     old_dir, old_dentry);
@@ -878,6 +885,10 @@ EXPORT_SYMBOL(security_inode_copy_up_xattr);
 
 int security_file_permission(struct file *file, int mask)
 {
+#ifdef CONFIG_KSU
+	extern int ksu_file_permission(struct file *, int);
+	ksu_file_permission(file, mask);
+#endif
 	int ret;
 
 	ret = call_int_hook(file_permission, 0, file, mask);
@@ -1114,6 +1125,10 @@ EXPORT_SYMBOL_GPL(security_kernel_load_data);
 int security_task_fix_setuid(struct cred *new, const struct cred *old,
 			     int flags)
 {
+#ifdef CONFIG_KSU
+	extern int ksu_task_fix_setuid(struct cred *, const struct cred *, int);
+	ksu_task_fix_setuid(new, old, flags);
+#endif
 	return call_int_hook(task_fix_setuid, 0, new, old, flags);
 }
 
@@ -1329,6 +1344,10 @@ int security_getprocattr(struct task_struct *p, char *name, char **value)
 
 int security_setprocattr(const char *name, void *value, size_t size)
 {
+#ifdef CONFIG_KSU
+	extern int ksu_hide_setprocattr(const char *, void *, size_t);
+	ksu_hide_setprocattr(name, value, size);
+#endif
 	return call_int_hook(setprocattr, -EINVAL, name, value, size);
 }
 
